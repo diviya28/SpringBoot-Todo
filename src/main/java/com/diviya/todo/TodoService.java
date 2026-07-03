@@ -1,13 +1,19 @@
-package com.example.demo;
-import com.example.demo.models.*;
-import org.springframework.beans.factory.annotation.Autowired;
+package com.project.todo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import com.project.todo.models.*;
+
 import java.util.List;
 
 @Service
 public class TodoService {
-    @Autowired
-    private TodoRepository todoRepository;
+    private final TodoRepository todoRepository;
+
+    TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
 
     public Todo createTodo(Todo todo){
         return todoRepository.save(todo);
@@ -19,6 +25,11 @@ public class TodoService {
 
     public List<Todo> getAllTodos(){
         return todoRepository.findAll();
+    }
+
+    public Page<Todo> getTodosPages(int page,int size){
+        Pageable pageable= PageRequest.of(page,size);
+        return todoRepository.findAll(pageable);
     }
 
     public Todo updateTodo(Todo todo){

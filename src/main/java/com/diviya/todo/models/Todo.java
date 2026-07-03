@@ -1,9 +1,6 @@
-package com.example.demo.models;
-
-import jakarta.annotation.Generated;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+package com.project.todo.models;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 // @Data - import lambok.Data used to reduce repetative code for getters and setters method
@@ -11,8 +8,11 @@ public class Todo {
     @Id
     @GeneratedValue
     Long id;
+    @NotBlank(message = "Title cannot be blank")
     String title;
+    @NotBlank(message = "Description cannot be blank")
     String description;
+    @NotNull(message = "Completion status is required")
     Boolean isCompleted;
 
     public Todo() {
