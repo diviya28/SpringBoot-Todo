@@ -1,4 +1,4 @@
-package com.project.todo.models;
+package com.diviya.todo.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
