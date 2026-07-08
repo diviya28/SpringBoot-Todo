@@ -1,5 +1,9 @@
 package com.diviya.todo;
 import com.diviya.todo.models.*;
+
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,6 +47,10 @@ public class TodoController {
         return new ResponseEntity<>(createTodo,HttpStatus.CREATED);
     }
 
+    @ApiResponses(value={
+        @ApiResponse(responseCode ="200", description = "Todo retrieved Successfully" ),
+        @ApiResponse(responseCode = "404", description = "Todo was not found!")
+    })
     @GetMapping("/get/{id}")
     public ResponseEntity<Todo> getTodoById(@PathVariable Long id) {
         log.info("Received request to fetch todo with id: {}", id);
