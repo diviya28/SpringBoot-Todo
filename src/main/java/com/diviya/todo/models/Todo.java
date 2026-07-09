@@ -10,8 +10,6 @@ public class Todo {
     Long id;
     @NotBlank(message = "Title cannot be blank")
     String title;
-    @NotBlank(message = "Description cannot be blank")
-    String description;
     @NotNull(message = "Completion status is required")
     Boolean isCompleted;
 
@@ -32,14 +30,6 @@ public class Todo {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Boolean getIsCompleted() {
