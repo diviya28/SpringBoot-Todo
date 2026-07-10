@@ -1,4 +1,5 @@
-package com.diviya.todo;
+package com.diviya.todo.service;
+import com.diviya.todo.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;

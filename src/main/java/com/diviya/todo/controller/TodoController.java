@@ -1,5 +1,6 @@
-package com.diviya.todo;
+package com.diviya.todo.controller;
 import com.diviya.todo.models.*;
+import com.diviya.todo.service.TodoService;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
