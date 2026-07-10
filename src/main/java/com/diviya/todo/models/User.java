@@ -3,14 +3,13 @@ package com.diviya.todo.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Entity
-@Table(name="users")
 @Builder
-@lombok.AllArgsConstructor
-@lombok.NoArgsConstructor
-
+@AllArgsConstructor
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue
