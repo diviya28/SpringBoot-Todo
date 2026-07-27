@@ -1,4 +1,5 @@
 package com.diviya.todo.service;
+import com.diviya.todo.dto.RegisterRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.diviya.todo.repository.*;
@@ -15,8 +16,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUser(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User createUser(RegisterRequest request){
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
         return userRepository.save(user);
     }
 
