@@ -13,8 +13,11 @@ public class Todo {
     @NotNull(message = "Completion status is required")
     Boolean isCompleted;
 
-    public Todo() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+
+    public Todo() {}
 
     public Long getId() {
         return id;
@@ -39,4 +42,8 @@ public class Todo {
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
+
+    public User getOwner() { return owner; }
+
+    public void setOwner(User owner) { this.owner = owner; }
 }

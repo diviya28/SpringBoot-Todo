@@ -1,5 +1,6 @@
 package com.diviya.todo.service;
 import com.diviya.todo.dto.RegisterRequest;
+import com.diviya.todo.exception.UserNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.diviya.todo.repository.*;
@@ -25,6 +26,6 @@ public class UserService {
     }
 
     public User getUserById(Long id){
-        return userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found with id: "+id));
+        return userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User not found with id: "+id));
     }
 }

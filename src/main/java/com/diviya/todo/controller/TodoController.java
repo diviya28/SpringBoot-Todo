@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.*;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,11 +39,15 @@ public class TodoController {
         this.todoService = todoService;
     }
 
+    private String currentEmail(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Todo> createUser(@Valid @RequestBody Todo todo) {
         log.info("Received request to create todo with title : {}",todo.getTitle());
 
-        Todo createTodo=todoService.createTodo(todo);
+        Todo createTodo=todoService.createTodo(todo,currentEmail());
 
         log.info("Todo created successfully with id : {}",createTodo.getId());
 
@@ -56,7 +62,7 @@ public class TodoController {
     public ResponseEntity<Todo> getTodoById(@PathVariable Long id) {
         log.info("Received request to fetch todo with id: {}", id);
         try{
-            Todo status=todoService.getTodoById(id);
+            Todo status=todoService.getTodoById(id,currentEmail());
 
             log.info("Successfully fetched todo with id: {}", id);
 
@@ -73,7 +79,7 @@ public class TodoController {
     public ResponseEntity<List<Todo>> getTodos(){
         log.info("Received request to fetch all todos");
 
-        List<Todo> todos = todoService.getAllTodos();
+        List<Todo> todos = todoService.getAllTodos(currentEmail());
 
         log.info("Fetched {} todos successfully", todos.size());
 
@@ -84,7 +90,7 @@ public class TodoController {
     public ResponseEntity<Todo> updateTodoById(@Valid @RequestBody Todo todo) {
         log.info("Received request to update todo with id: {}", todo.getId());
 
-        Todo updatedTodo = todoService.updateTodo(todo);
+        Todo updatedTodo = todoService.updateTodo(todo,currentEmail());
 
         log.info("Todo updated successfully with id: {}", updatedTodo.getId());
 
@@ -95,7 +101,7 @@ public class TodoController {
     public ResponseEntity<Page<Todo>> getTodos(@RequestParam int page,@RequestParam int size ){
         log.info("Fetching todos with page={} and size={}", page, size);
 
-        Page<Todo> todos = todoService.getTodosPages(page, size);
+        Page<Todo> todos = todoService.getTodosPages(currentEmail(),page, size);
 
         log.info("Fetched {} todos from page {}", todos.getNumberOfElements(), page);
         
@@ -106,7 +112,7 @@ public class TodoController {
     public ResponseEntity<Void> deleteTodoById(@PathVariable Long id) {
         log.info("Received request to delete todo with id: {}", id);
 
-        todoService.deleteTodoBy(id);
+        todoService.deleteTodoById(id,currentEmail());
 
         log.info("Todo deleted successfully with id: {}", id);
         

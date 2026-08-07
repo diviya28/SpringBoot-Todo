@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +17,13 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private long expirationTime;
-    private final Key secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
+    private Key secretKey;   // no longer final, no longer initialized inline
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
     public String generateToken(String email){
         return Jwts.builder()
                  .setSubject(email)
