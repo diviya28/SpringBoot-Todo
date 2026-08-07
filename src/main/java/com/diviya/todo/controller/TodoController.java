@@ -1,4 +1,6 @@
 package com.diviya.todo.controller;
+import com.diviya.todo.dto.TodoRequest;
+import com.diviya.todo.dto.TodoResponse;
 import com.diviya.todo.models.*;
 import com.diviya.todo.service.TodoService;
 
@@ -6,17 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +20,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
-
-
 
 @RestController
 @RequestMapping("/api/v1/todo")
@@ -44,81 +37,82 @@ public class TodoController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Todo> createUser(@Valid @RequestBody Todo todo) {
-        log.info("Received request to create todo with title : {}",todo.getTitle());
+    public ResponseEntity<TodoResponse> createTodo(@Valid @RequestBody TodoRequest request) {
+        log.info("Received request to create todo with title : {}", request.getTitle());
 
-        Todo createTodo=todoService.createTodo(todo,currentEmail());
+        Todo createdTodo = todoService.createTodo(request, currentEmail());
 
-        log.info("Todo created successfully with id : {}",createTodo.getId());
+        log.info("Todo created successfully with id : {}", createdTodo.getId());
 
-        return new ResponseEntity<>(createTodo,HttpStatus.CREATED);
+        return new ResponseEntity<>(TodoResponse.fromEntity(createdTodo), HttpStatus.CREATED);
     }
 
     @ApiResponses(value={
-        @ApiResponse(responseCode ="200", description = "Todo retrieved Successfully" ),
-        @ApiResponse(responseCode = "404", description = "Todo was not found!")
+            @ApiResponse(responseCode ="200", description = "Todo retrieved Successfully" ),
+            @ApiResponse(responseCode = "404", description = "Todo was not found!")
     })
     @GetMapping("/get/{id}")
-    public ResponseEntity<Todo> getTodoById(@PathVariable Long id) {
+    public ResponseEntity<TodoResponse> getTodoById(@PathVariable Long id) {
         log.info("Received request to fetch todo with id: {}", id);
         try{
-            Todo status=todoService.getTodoById(id,currentEmail());
+            Todo todo = todoService.getTodoById(id, currentEmail());
 
             log.info("Successfully fetched todo with id: {}", id);
 
-            return new ResponseEntity<>(status,HttpStatus.OK);
+            return new ResponseEntity<>(TodoResponse.fromEntity(todo), HttpStatus.OK);
         }
         catch(RuntimeException e){
             log.warn("Todo not found with id: {}. {}", id, e.getMessage());
 
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
-    
+
     @GetMapping
-    public ResponseEntity<List<Todo>> getTodos(){
+    public ResponseEntity<List<TodoResponse>> getTodos(){
         log.info("Received request to fetch all todos");
 
-        List<Todo> todos = todoService.getAllTodos(currentEmail());
+        List<TodoResponse> todos = todoService.getAllTodos(currentEmail())
+                .stream()
+                .map(TodoResponse::fromEntity)
+                .collect(Collectors.toList());
 
         log.info("Fetched {} todos successfully", todos.size());
 
-        return new ResponseEntity<>(todos,HttpStatus.OK);
+        return new ResponseEntity<>(todos, HttpStatus.OK);
     }
-    
-    @PutMapping()
-    public ResponseEntity<Todo> updateTodoById(@Valid @RequestBody Todo todo) {
-        log.info("Received request to update todo with id: {}", todo.getId());
 
-        Todo updatedTodo = todoService.updateTodo(todo,currentEmail());
+    @PutMapping("/{id}")
+    public ResponseEntity<TodoResponse> updateTodoById(@PathVariable Long id, @Valid @RequestBody TodoRequest request) {
+        log.info("Received request to update todo with id: {}", id);
+
+        Todo updatedTodo = todoService.updateTodo(id, request, currentEmail());
 
         log.info("Todo updated successfully with id: {}", updatedTodo.getId());
 
-        return new ResponseEntity<>(updatedTodo,HttpStatus.OK);
+        return new ResponseEntity<>(TodoResponse.fromEntity(updatedTodo), HttpStatus.OK);
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<Todo>> getTodos(@RequestParam int page,@RequestParam int size ){
+    public ResponseEntity<Page<TodoResponse>> getTodosPage(@RequestParam int page, @RequestParam int size){
         log.info("Fetching todos with page={} and size={}", page, size);
 
-        Page<Todo> todos = todoService.getTodosPages(currentEmail(),page, size);
+        Page<TodoResponse> todos = todoService.getTodosPages(currentEmail(), page, size)
+                .map(TodoResponse::fromEntity);
 
         log.info("Fetched {} todos from page {}", todos.getNumberOfElements(), page);
-        
-        return new ResponseEntity<>(todos,HttpStatus.OK);
+
+        return new ResponseEntity<>(todos, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTodoById(@PathVariable Long id) {
         log.info("Received request to delete todo with id: {}", id);
 
-        todoService.deleteTodoById(id,currentEmail());
+        todoService.deleteTodoById(id, currentEmail());
 
         log.info("Todo deleted successfully with id: {}", id);
-        
-        return  ResponseEntity.noContent().build();
+
+        return ResponseEntity.noContent().build();
     }
 }
-
-
-

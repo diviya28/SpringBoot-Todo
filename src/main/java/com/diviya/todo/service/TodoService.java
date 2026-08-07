@@ -1,4 +1,5 @@
 package com.diviya.todo.service;
+import com.diviya.todo.dto.TodoRequest;
 import com.diviya.todo.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +20,11 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    public Todo createTodo(Todo todo,String email){
+    public Todo createTodo(TodoRequest request, String email){
         User owner = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Todo todo = new Todo();
+        todo.setTitle(request.getTitle());
+        todo.setIsCompleted(request.getIsCompleted());
         todo.setOwner(owner);
         return todoRepository.save(todo);
     }
@@ -38,11 +42,10 @@ public class TodoService {
         return todoRepository.findAllByOwnerEmail(email,pageable);
     }
 
-    public Todo updateTodo(Todo todo,String email){
-
-        Todo existing = getTodoById(todo.getId(), email);
-        existing.setTitle(todo.getTitle());
-        existing.setIsCompleted(todo.getIsCompleted());
+    public Todo updateTodo(Long id,TodoRequest request, String email){
+        Todo existing = getTodoById(id, email);
+        existing.setTitle(request.getTitle());
+        existing.setIsCompleted(request.getIsCompleted());
         return todoRepository.save(existing);
     }
 
